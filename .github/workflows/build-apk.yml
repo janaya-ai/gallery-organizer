@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
@@ -22,13 +25,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
       - name: Prebuild Android project
-        run: npx expo prebuild --platform android --clean
+        run: npx expo prebuild --platform android --clean --no-install
 
       - name: Build Android APK (Debug)
         run: |
@@ -39,6 +41,20 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GalleryOrganizer-Android-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: GalleryOrganizer-APK
+          path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Gallery Organizer v1.0.${{ github.run_number }}
+          body: |
+            ### Native Android APK for Gallery Organizer
+            - Download app-debug.apk directly onto your Android device.
+            - Tap to install (enable Install unknown apps if prompted).
+          files: android/app/build/outputs/apk/debug/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
