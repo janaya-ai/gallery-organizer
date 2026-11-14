@@ -32,11 +32,16 @@ jobs:
       - name: Prebuild Android project
         run: npx expo prebuild --platform android --clean --no-install
 
+      - name: Ensure Kotlin 1.9.25 in gradle properties
+        run: |
+          echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
+          echo "kotlinVersion=1.9.25" >> android/gradle.properties
+
       - name: Build Android APK (Debug)
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -53,7 +58,7 @@ jobs:
           name: Gallery Organizer v1.0.${{ github.run_number }}
           body: |
             ### Native Android APK for Gallery Organizer
-            - Download app-debug.apk directly onto your Android device.
+            - Download `app-debug.apk` directly onto your Android device.
             - Tap to install (enable Install unknown apps if prompted).
           files: android/app/build/outputs/apk/debug/*.apk
         env:
