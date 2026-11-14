@@ -32,22 +32,28 @@ jobs:
       - name: Prebuild Android project
         run: npx expo prebuild --platform android --clean --no-install
 
-      - name: Ensure Kotlin 1.9.25 in gradle properties
+      - name: Configure offline bundle and Kotlin 1.9.25
         run: |
           echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
           echo "kotlinVersion=1.9.25" >> android/gradle.properties
+          # Force bundling offline JS bundle into the APK
+          sed -i 's/\/\/ debuggableVariants = .*/debuggableVariants = []/' android/app/build.gradle
 
-      - name: Build Android APK (Debug)
+      - name: Build Standalone Release APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 --no-daemon
+          ./gradlew assembleRelease -Pandroid.kotlinVersion=1.9.25 -PkotlinVersion=1.9.25 --no-daemon
+          cd ..
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/*.apk dist/GalleryOrganizer.apk
+          ls -lh dist/GalleryOrganizer.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: GalleryOrganizer-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: dist/GalleryOrganizer.apk
           if-no-files-found: error
 
       - name: Create GitHub Release with APK
@@ -57,9 +63,10 @@ jobs:
           tag_name: v1.0.${{ github.run_number }}
           name: Gallery Organizer v1.0.${{ github.run_number }}
           body: |
-            ### Native Android APK for Gallery Organizer
-            - Download `app-debug.apk` directly onto your Android device.
-            - Tap to install (enable Install unknown apps if prompted).
-          files: android/app/build/outputs/apk/debug/*.apk
+            ### Standalone Android APK for Gallery Organizer
+            - Contains full offline JavaScript bundle.
+            - Download `GalleryOrganizer.apk` directly onto your Android device.
+            - Tap to install (enable "Install unknown apps" for your browser if prompted).
+          files: dist/GalleryOrganizer.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
