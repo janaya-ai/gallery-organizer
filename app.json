@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Gallery Organizer",
+    "slug": "gallery-organizer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow Gallery Organizer to access photos to add titles, search, and organize duplicates.",
+        "NSPhotoLibraryAddUsageDescription": "Allow Gallery Organizer to save sorted photos into albums."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0f172a"
+      },
+      "package": "com.janaya.galleryorganizer",
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "ACCESS_MEDIA_LOCATION"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Gallery Organizer to access your photos to organize, title, and group them.",
+          "savePhotosPermission": "Allow Gallery Organizer to save sorted photos to albums."
+        }
+      ],
+      "expo-sqlite"
+    ]
+  }
+}
