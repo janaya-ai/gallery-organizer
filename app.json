@@ -36,7 +36,15 @@
           "savePhotosPermission": "Allow Gallery Organizer to save sorted photos to albums."
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
     ]
   }
 }
